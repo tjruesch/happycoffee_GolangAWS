@@ -1,1 +1,2 @@
-# happycoffee_GolangAWS
+# happycoffee - modern serverless Go applications with AWS
+
