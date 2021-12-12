@@ -20,6 +20,10 @@ func BadRequest(slug string, err error, w http.ResponseWriter, r *http.Request) 
 	httpRespondWithError(err, slug, w, r, "Bad request", http.StatusBadRequest)
 }
 
+func NotFound(slug string, err error, w http.ResponseWriter, r *http.Request) {
+	httpRespondWithError(err, slug, w, r, "Not found", http.StatusNotFound)
+}
+
 func NotImplementedError(slug string, err error, w http.ResponseWriter, r *http.Request) {
 	httpRespondWithError(err, slug, w, r, "not implemented", http.StatusNotImplemented)
 }
