@@ -1,7 +1,6 @@
 package domain
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -23,30 +22,12 @@ func (p *Product) Name() string {
 	return p.name
 }
 
-func (p *Product) Price() string {
-	return fmt.Sprintf("%.2f", p.price) + " EUR"
+func (p *Product) Price() float32 {
+	return p.price
 }
 
-func (p *Product) HappyDay() string {
-	var day string
-	switch p.happyDay {
-	case 0:
-		day = "Sunday"
-	case 1:
-		day = "Monday"
-	case 2:
-		day = "Tuesday"
-	case 3:
-		day = "Wednesday"
-	case 4:
-		day = "Thursday"
-	case 5:
-		day = "Friday"
-	case 6:
-		day = "Saturday"
-	}
-
-	return day
+func (p *Product) HappyDay() int {
+	return p.happyDay
 }
 
 func (p *Product) DiscountInPercent() int {
