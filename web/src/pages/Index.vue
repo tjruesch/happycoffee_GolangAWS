@@ -1,5 +1,8 @@
 <template>
     <app-layout>
+        <div class="hero w-100">
+            <img src="../assets/media/hero.jpg" alt="Best Coffee in Town" width="100%">
+        </div>
         <div class="py-5 text-center">
             <h1 style="font-size: 3.5rem; color: #555;">happy&middot;<span style="color: #9e1b45;">coffee</span></h1>
             <span class="mb-5">Coffe <span style="color: #9e1b45;">&</span>more</span>
