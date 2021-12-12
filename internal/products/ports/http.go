@@ -1,13 +1,18 @@
-package handlers
+package ports
 
 import (
 	"fmt"
 	"net/http"
 
+	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
-	"github.com/truesch/happycoffee_GolangAWS/internal/products/adapters"
 	"github.com/truesch/happycoffee_GolangAWS/internal/products/domain"
 )
+
+type server struct {
+	repo   domain.Repository
+	Router chi.Mux
+}
 
 type ProductReadModel struct {
 	Name     string `json:"name"`
@@ -16,31 +21,41 @@ type ProductReadModel struct {
 	Discount int    `json:"discount"`
 }
 
-func GetProducts(w http.ResponseWriter, r *http.Request) {
-	productsInDB := adapters.GetAllProducts()
-	products := domainProductsToOutput(productsInDB)
+func NewProductsServer(repo domain.Repository) *server {
+	return &server{
+		repo:   repo,
+		Router: *chi.NewRouter(),
+	}
+}
+
+func (s server) GetProducts(w http.ResponseWriter, r *http.Request) {
+	productsInDB, err := s.repo.GetAllProducts()
+	if err != nil {
+		InternalError("Error getting products from database", err, w, r)
+	}
+	products := s.domainProductsToOutput(productsInDB)
 
 	render.Respond(w, r, products)
 }
 
-func AddNewProduct(w http.ResponseWriter, r *http.Request) {
+func (s server) AddNewProduct(w http.ResponseWriter, r *http.Request) {
 	NotImplementedError("Endpoint not implemented", nil, w, r)
 }
 
-func DeleteProduct(w http.ResponseWriter, r *http.Request) {
+func (s server) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 	NotImplementedError("Endpoint not implemented", nil, w, r)
 }
 
-func domainProductsToOutput(products []*domain.Product) []*ProductReadModel {
+func (s server) domainProductsToOutput(products []*domain.Product) []*ProductReadModel {
 	out := []*ProductReadModel{}
 	for _, p := range products {
-		out = append(out, domainProductToReadModel(p))
+		out = append(out, s.domainProductToReadModel(p))
 	}
 
 	return out
 }
 
-func domainProductToReadModel(p *domain.Product) *ProductReadModel {
+func (s server) domainProductToReadModel(p *domain.Product) *ProductReadModel {
 
 	var day string
 	switch p.HappyDay() {
