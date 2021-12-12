@@ -2,10 +2,11 @@
     <app-layout>
         <div class="hero w-100">
             <img src="../assets/media/hero.jpg" alt="Best Coffee in Town" width="100%">
+            <span>&copy; Nathan Dumalo <a href="https://unsplash.com/photos/KixfBEdyp64">@ Unspash</a></span>
         </div>
-        <div class="pb-5 text-center">
+        <div class="text-center">
             <h1 style="font-size: 3.5rem; color: #555;">happy&middot;<span style="color: #9e1b45;">coffee</span></h1>
-            <span class="mb-5">Coffe <span style="color: #9e1b45;">&</span>more</span>
+            <span>Coffe <span style="color: #9e1b45;">&</span>more</span>
         </div>
         <h3 class="mb-3">Our Specialities</h3>
         <div>
