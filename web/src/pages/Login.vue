@@ -34,9 +34,6 @@
             LoginLayout,
         },
         mounted() {
-            if (Auth.isLoggedIn()) {
-                this.$router.push({name: 'trainingsList'});
-            }
         },
         methods: {
             submit: function () {

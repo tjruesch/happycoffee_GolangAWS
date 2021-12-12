@@ -30,9 +30,19 @@
         },
         created() {
             axios.get("http://localhost:9090/v1/products")
-                 .then(data => {
-                     console.log(data)
-                     this.products = data.data
+                 .then(resp => {
+                     resp.data.forEach(element => {
+                         console.log(element)
+                         if (element['discount'] !== 0) {
+                             let priceOld = element['price']
+                             let priceNew = (parseFloat(element['price']) * (100-element['discount'])/100 ).toPrecision(3)
+                             element['price'] = `
+                                <span style="text-decoration: line-through; opacity: 0.5;">${priceOld}</span>
+                                <span class="pl-2" style="font-weight: bold;"><em>${priceNew} EUR</em></span>
+                                `
+                         }
+                     });
+                     this.products = resp.data
                  })
                  .catch(function (error) {
                    console.log(error)
@@ -53,10 +63,6 @@
                 {
                     field: 'happy_day',
                     label: 'Happy Day',
-                },
-                {
-                    field: 'discount',
-                    label: 'Discount',
                 },
                 ]
             }
@@ -89,20 +95,7 @@
     body {
         background-color: #f5f5f5;
     }
-
-    .old-date {
+    .old-price {
         text-decoration: line-through;
-        opacity: 0.5;
-    }
-    .spacer {
-        min-height: 100px;
-    }
-    .props {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-    .citation {
-        font-size: 1.7rem;
     }
 </style>
