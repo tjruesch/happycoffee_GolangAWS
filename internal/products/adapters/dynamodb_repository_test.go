@@ -12,7 +12,7 @@ import (
 // In a more prodcution-like environment you would want to structure your
 // tests differntly
 
-const testTable string = "products_test"
+const testTable string = "happycoffee_products_test"
 
 func TestInit(t *testing.T) {
 	dynamoRepo := adapters.NewProjectDynamoDBRepository()
