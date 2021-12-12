@@ -1,6 +1,8 @@
 package ports
 
 import (
+	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 
@@ -14,11 +16,17 @@ type server struct {
 	Router chi.Mux
 }
 
-type ProductReadModel struct {
+type ProductOutput struct {
 	Name     string `json:"name"`
 	Price    string `json:"price"`
 	HappyDay string `json:"happy_day"`
 	Discount int    `json:"discount"`
+}
+
+type ProductInput struct {
+	Name     string  `json:"name"`
+	Price    float32 `json:"price"`
+	HappyDay string  `json:"happy_day"`
 }
 
 func NewProductsServer(repo domain.Repository) *server {
@@ -39,23 +47,38 @@ func (s server) GetProducts(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s server) AddNewProduct(w http.ResponseWriter, r *http.Request) {
-	NotImplementedError("Endpoint not implemented", nil, w, r)
+	productIn := ProductInput{}
+
+	err := json.NewDecoder(r.Body).Decode(&productIn)
+	if err != nil {
+		BadRequest("Invalid input", err, w, r)
+	}
+
+	p, err := s.inputToDomainProduct(&productIn)
+	if err != nil {
+		BadRequest("Invalid weekday", err, w, r)
+	}
+
+	err = s.repo.SaveProduct(p)
+	if err != nil {
+		InternalError("Error saving product to database", err, w, r)
+	}
 }
 
 func (s server) DeleteProduct(w http.ResponseWriter, r *http.Request) {
 	NotImplementedError("Endpoint not implemented", nil, w, r)
 }
 
-func (s server) domainProductsToOutput(products []*domain.Product) []*ProductReadModel {
-	out := []*ProductReadModel{}
+func (s server) domainProductsToOutput(products []*domain.Product) []*ProductOutput {
+	out := []*ProductOutput{}
 	for _, p := range products {
-		out = append(out, s.domainProductToReadModel(p))
+		out = append(out, s.domainProductToOutput(p))
 	}
 
 	return out
 }
 
-func (s server) domainProductToReadModel(p *domain.Product) *ProductReadModel {
+func (s server) domainProductToOutput(p *domain.Product) *ProductOutput {
 
 	var day string
 	switch p.HappyDay() {
@@ -75,10 +98,38 @@ func (s server) domainProductToReadModel(p *domain.Product) *ProductReadModel {
 		day = "Saturday"
 	}
 
-	return &ProductReadModel{
+	return &ProductOutput{
 		Name:     p.Name(),
 		Price:    fmt.Sprintf("%.2f", p.Price()) + " EUR",
 		HappyDay: day,
 		Discount: p.DiscountInPercent(),
 	}
+}
+
+func (s server) inputToDomainProduct(in *ProductInput) (*domain.Product, error) {
+	var day int
+	switch in.HappyDay {
+	case "Sunday":
+		day = 0
+	case "Monday":
+		day = 1
+	case "Tuesday":
+		day = 2
+	case "Wednesday":
+		day = 3
+	case "Thursday":
+		day = 4
+	case "Friday":
+		day = 5
+	case "Saturday":
+		day = 6
+	default:
+		day = -1
+	}
+
+	if day == -1 {
+		return &domain.Product{}, errors.New("invalid day")
+	}
+
+	return domain.NewProduct(in.Name, in.Price, day), nil
 }
