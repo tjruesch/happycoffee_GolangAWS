@@ -1,12 +1,8 @@
 package domain
 
-import (
-	"context"
-)
-
 type Repository interface {
-	GetAllProducts(ctx context.Context) []*Product
+	GetAllProducts() ([]*Product, error)
 
-	AddNewProduct(ctx context.Context, product *Product)
-	DeleteProduct(ctx context.Context, productName string)
+	SaveProduct(product *Product) error
+	DeleteProduct(productName string) error
 }
