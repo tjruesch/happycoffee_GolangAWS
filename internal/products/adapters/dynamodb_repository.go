@@ -1,6 +1,8 @@
 package adapters
 
 import (
+	"errors"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -192,7 +194,8 @@ func (r ProductsDynamoDBRepository) GetAllProducts() ([]*domain.Product, error) 
 func (r ProductsDynamoDBRepository) DeleteProduct(name string) error {
 
 	in := &dynamodb.DeleteItemInput{
-		TableName: &r.TableName,
+		TableName:    &r.TableName,
+		ReturnValues: aws.String("ALL_OLD"),
 		Key: map[string]*dynamodb.AttributeValue{
 			"Name": {
 				S: aws.String(name),
@@ -200,10 +203,16 @@ func (r ProductsDynamoDBRepository) DeleteProduct(name string) error {
 		},
 	}
 
-	_, err := r.DynamoClient.DeleteItem(in)
+	out, err := r.DynamoClient.DeleteItem(in)
 	if err != nil {
 		logrus.Error("unable to delete item in dynamodb")
 		return err
+	}
+
+	// DeleteItem will not fail if no item with the name is found
+	// but DeleteItemOutput.Attributes will be nil
+	if out.Attributes == nil {
+		return errors.New("item not found")
 	}
 
 	return err
