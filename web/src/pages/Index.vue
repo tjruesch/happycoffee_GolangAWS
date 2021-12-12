@@ -3,13 +3,13 @@
         <div class="hero w-100">
             <img src="../assets/media/hero.jpg" alt="Best Coffee in Town" width="100%">
         </div>
-        <div class="py-5 text-center">
+        <div class="pb-5 text-center">
             <h1 style="font-size: 3.5rem; color: #555;">happy&middot;<span style="color: #9e1b45;">coffee</span></h1>
             <span class="mb-5">Coffe <span style="color: #9e1b45;">&</span>more</span>
         </div>
         <h3 class="mb-3">Our Specialities</h3>
         <div>
-            <b-table :data="data" :columns="columns"></b-table>
+            <b-table :data="products" :columns="columns"></b-table>
         </div>
         <div class="text-center mt-5">
             <a class="btn btn-outline-primary btn-lg text-primary" href="#">Download PDF Menue</a>
@@ -21,20 +21,28 @@
 
 <script>
     import AppLayout from '../layouts/App.vue'
+    import axios from 'axios';
 
     export default {
         components: {
             AppLayout,
         },
+        created() {
+            axios.get("http://localhost:9090/v1/products")
+                 .then(data => {
+                     console.log(data)
+                     this.products = data.data
+                 })
+                 .catch(function (error) {
+                   console.log(error)
+                 })
+        },
         data() {
             return {
-                data: [
-                    {drink: "Cold Brew", price: "4.50 EUR", happy_day: "Monday"},
-                    {drink: "Cappuchino", price: "4.50 EUR", happy_day: "Wednesday"}
-                ],
+                products: [],
                 columns: [
                 {
-                    field: 'drink',
+                    field: 'name',
                     label: 'Drink',
                 },
                 {
@@ -44,7 +52,11 @@
                 {
                     field: 'happy_day',
                     label: 'Happy Day',
-                }
+                },
+                {
+                    field: 'discount',
+                    label: 'Discount',
+                },
                 ]
             }
         }
