@@ -9,7 +9,7 @@
             <b-table :data="data" :columns="columns"></b-table>
         </div>
         <div class="text-center mt-5">
-            <a class="btn btn-outline-primary btn-lg text-primary"href="#">Download PDF Menue</a>
+            <a class="btn btn-outline-primary btn-lg text-primary" href="#">Download PDF Menue</a>
         </div>
 
 
