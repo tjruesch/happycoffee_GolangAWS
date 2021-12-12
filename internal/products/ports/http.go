@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"strings"
 
 	"github.com/go-chi/chi"
 	"github.com/go-chi/render"
@@ -66,7 +67,24 @@ func (s server) AddNewProduct(w http.ResponseWriter, r *http.Request) {
 }
 
 func (s server) DeleteProduct(w http.ResponseWriter, r *http.Request) {
-	NotImplementedError("Endpoint not implemented", nil, w, r)
+	productName := chi.URLParam(r, "productName")
+
+	if productName == "" {
+		BadRequest("Could not parse product name from URL", nil, w, r)
+	}
+
+	// expect space in product name to be replaced by a dash in request
+	productName = strings.Replace(productName, "-", " ", -1)
+
+	err := s.repo.DeleteProduct(productName)
+	if err != nil {
+		if err.Error() == "item not found" {
+			NotFound("Product not found", err, w, r)
+		} else {
+			InternalError("Error deleting product from database", err, w, r)
+		}
+	}
+
 }
 
 func (s server) domainProductsToOutput(products []*domain.Product) []*ProductOutput {

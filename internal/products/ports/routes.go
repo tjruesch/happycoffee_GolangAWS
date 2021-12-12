@@ -7,7 +7,7 @@ func (s *server) SetRoutes() {
 		r.Route("/products", func(r chi.Router) {
 			r.Get("/", s.GetProducts)
 			r.Post("/", s.AddNewProduct)
-			r.Delete("/{productID}", s.DeleteProduct)
+			r.Delete("/{productName}", s.DeleteProduct)
 		})
 	})
 }
